@@ -1,10 +1,21 @@
 "use client";
 import Link from 'next/link';
 import { Home, Search, Bell, Mail, FileText, User, MoreHorizontal, Zap, Building, Landmark, Truck, BarChart3, ShieldCheck } from 'lucide-react';
+type SidebarPage =
+    | 'feed'
+    | 'matches'
+    | 'reports'
+    | 'profile'
+    | 'messages'
+    | 'notifications'
+    | 'logistics'
+    | 'csr'
+    | 'govt';
 
 interface SidebarProps {
-    current: 'feed' | 'matches' | 'reports' | 'profile' | 'messages' | 'notifications';
+    current: SidebarPage;
 }
+
 
 export default function Sidebar({ current }: SidebarProps) {
     const menuItems = [
