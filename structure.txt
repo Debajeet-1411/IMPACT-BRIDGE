@@ -1,0 +1,115 @@
+BUILDATHON PROJECTS 2/
+|-- .gitignore
+|-- README.md
+|-- backend/
+|   |-- .env
+|   |-- check_data.py
+|   |-- error.log
+|   |-- list_models.py
+|   |-- models.txt
+|   |-- real_seed.py
+|   |-- requirements.txt
+|   |-- seed.py
+|   |-- seed_detail.log
+|   |-- seed_error.log
+|   |-- simple_seed.py
+|   |-- sql_app.db
+|   |-- test_api.py
+|   |-- test_chat_service.py
+|   |-- test_db.py
+|   |-- test_output.txt
+|   |-- app/
+|   |   |-- main.py
+|   |   |-- api/
+|   |   |   |-- auth.py
+|   |   |   |-- chat.py
+|   |   |   |-- posts.py
+|   |   |   |-- profiles.py
+|   |   |-- core/
+|   |   |   |-- security.py
+|   |   |-- db/
+|   |   |   |-- database.py
+|   |   |-- models/
+|   |   |   |-- social.py
+|   |   |   |-- user.py
+|   |   |   |-- __init__.py
+|   |   |-- schemas/
+|   |   |   |-- social.py
+|   |   |   |-- user.py
+|   |   |-- services/
+|   |   |   |-- ai_service.py
+|   |-- uploads/
+|-- frontend/
+|   |-- .gitignore
+|   |-- build_log.txt
+|   |-- eslint.config.mjs
+|   |-- full_build_log.txt
+|   |-- next-env.d.ts
+|   |-- next.config.ts
+|   |-- package-lock.json
+|   |-- package.json
+|   |-- postcss.config.mjs
+|   |-- README.md
+|   |-- tsconfig.json
+|   |-- tsconfig.tsbuildinfo
+|   |-- public/
+|   |   |-- file.svg
+|   |   |-- globe.svg
+|   |   |-- next.svg
+|   |   |-- vercel.svg
+|   |   |-- window.svg
+|   |-- src/
+|   |   |-- app/
+|   |   |   |-- favicon.ico
+|   |   |   |-- globals.css
+|   |   |   |-- layout.tsx
+|   |   |   |-- page.tsx
+|   |   |   |-- auth/
+|   |   |   |   |-- login/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |   |-- select-role/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |   |-- setup/
+|   |   |   |   |   |-- donor/
+|   |   |   |   |   |   |-- page.tsx
+|   |   |   |   |   |-- ngo/
+|   |   |   |   |   |   |-- page.tsx
+|   |   |   |   |-- signup/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |-- dashboard/
+|   |   |   |   |-- csr/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |   |-- govt/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |   |-- logistics/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |-- feed/
+|   |   |   |   |-- page.tsx
+|   |   |   |-- matches/
+|   |   |   |   |-- page.tsx
+|   |   |   |-- messages/
+|   |   |   |   |-- page.tsx
+|   |   |   |-- notifications/
+|   |   |   |   |-- page.tsx
+|   |   |   |-- posts/
+|   |   |   |   |-- [id]/
+|   |   |   |   |   |-- fulfil/
+|   |   |   |   |   |   |-- page.tsx
+|   |   |   |   |   |-- pickup/
+|   |   |   |   |   |   |-- page.tsx
+|   |   |   |-- profile/
+|   |   |   |   |-- page.tsx
+|   |   |   |   |-- [id]/
+|   |   |   |   |   |-- page.tsx
+|   |   |   |-- reports/
+|   |   |   |   |-- page.tsx
+|   |   |-- components/
+|   |   |   |-- Chatbot.tsx
+|   |   |   |-- EditProfileModal.tsx
+|   |   |   |-- MovingVehiclesMap.tsx
+|   |   |   |-- PostCard.tsx
+|   |   |   |-- PostEditor.tsx
+|   |   |   |-- RequestNeedModal.tsx
+|   |   |   |-- Sidebar.tsx
+|   |   |-- services/
+|   |   |   |-- api.ts
