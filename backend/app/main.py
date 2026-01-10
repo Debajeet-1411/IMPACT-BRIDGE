@@ -29,3 +29,22 @@ app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Google Antigravity API"}
+
+@app.on_event("startup")
+async def startup_event():
+    from app.db.database import SessionLocal
+    from app.models.user import User
+    from app.seed import seed
+    
+    db = SessionLocal()
+    try:
+        user_count = db.query(User).count()
+        if user_count == 0:
+            print("Database is empty. Running seed...")
+            seed()
+        else:
+            print("Database already contains data. Skipping seed.")
+    except Exception as e:
+        print(f"Error during startup seed check: {e}")
+    finally:
+        db.close()
