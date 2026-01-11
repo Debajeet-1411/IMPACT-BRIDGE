@@ -65,7 +65,7 @@ export default function FulfilRequestPage() {
                             The NGO has been notified. You can track this in your <span className="text-[#2563EB]">CSR Dashboard</span>.
                         </p>
                         <div className="flex gap-4 w-full">
-                            <button onClick={() => router.push('/feed')} className="flex-1 border border-[#536471] py-3 rounded-full font-bold hover:bg-[#EFF3F4]/10">Back to Feed</button>
+                            <button onClick={() => router.push('/home')} className="flex-1 border border-[#536471] py-3 rounded-full font-bold hover:bg-[#EFF3F4]/10">Back to Feed</button>
                             <button onClick={() => router.push('/dashboard/csr')} className="flex-1 bg-[#E7E9EA] text-black py-3 rounded-full font-bold hover:bg-[#D7DBDC]">Go to Dashboard</button>
                         </div>
                     </div>

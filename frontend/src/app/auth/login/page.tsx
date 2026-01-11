@@ -21,7 +21,7 @@ function LoginContent() {
             const response = await authService.login(email, role);
             localStorage.setItem('token', response.data.access_token);
             localStorage.setItem('role', role);
-            router.push('/feed');
+            router.push('/home');
         } catch (error) {
             console.error('Login failed', error);
             alert('Login failed. Please try again.');

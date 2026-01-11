@@ -19,7 +19,7 @@ interface SidebarProps {
 
 export default function Sidebar({ current }: SidebarProps) {
     const menuItems = [
-        { icon: Home, label: 'Home', href: '/feed', id: 'feed' },
+        { icon: Home, label: 'Home', href: '/home', id: 'feed' },
         { icon: Search, label: 'Explore Needs', href: '/matches', id: 'matches' },
         { icon: Bell, label: 'Notifications', href: '/notifications', id: 'notifications' },
         { icon: Mail, label: 'Messages', href: '/messages', id: 'messages' },

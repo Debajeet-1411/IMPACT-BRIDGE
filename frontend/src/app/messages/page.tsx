@@ -2,7 +2,7 @@
 import Sidebar from '@/components/Sidebar';
 import { Search, MoreHorizontal, Edit, Send } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 
 // Mock Data for previous interactions
 const MOCK_CHATS = [
@@ -37,7 +37,7 @@ interface Message {
     timestamp: Date;
 }
 
-export default function MessagesPage() {
+function MessagesContent() {
     const searchParams = useSearchParams();
     const postId = searchParams.get('postId');
     const intent = searchParams.get('intent');
@@ -178,8 +178,8 @@ export default function MessagesPage() {
                         <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                             <div
                                 className={`max-w-[80%] px-4 py-3 rounded-2xl text-[15px] whitespace-pre-wrap ${msg.sender === 'user'
-                                        ? 'bg-[#1D9BF0] text-white rounded-br-none'
-                                        : 'bg-[#202327] text-[#E7E9EA] rounded-bl-none'
+                                    ? 'bg-[#1D9BF0] text-white rounded-br-none'
+                                    : 'bg-[#202327] text-[#E7E9EA] rounded-bl-none'
                                     }`}
                             >
                                 {msg.text}
@@ -229,5 +229,13 @@ export default function MessagesPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function MessagesPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black text-[#E7E9EA] flex items-center justify-center">Loading chats...</div>}>
+            <MessagesContent />
+        </Suspense>
     );
 }

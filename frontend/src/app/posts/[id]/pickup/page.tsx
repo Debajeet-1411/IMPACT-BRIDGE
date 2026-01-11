@@ -75,7 +75,7 @@ export default function SchedulePickupPage() {
                             Track the vehicle status in the <span className="text-[#1D9BF0]">Logistics Panel</span>.
                         </p>
                         <div className="flex gap-4 w-full">
-                            <button onClick={() => router.push('/feed')} className="flex-1 border border-[#536471] py-3 rounded-full font-bold hover:bg-[#EFF3F4]/10">Back to Feed</button>
+                            <button onClick={() => router.push('/home')} className="flex-1 border border-[#536471] py-3 rounded-full font-bold hover:bg-[#EFF3F4]/10">Back to Feed</button>
                             <button onClick={() => router.push('/dashboard/logistics')} className="flex-1 bg-[#E7E9EA] text-black py-3 rounded-full font-bold hover:bg-[#D7DBDC]">Go to Panel</button>
                         </div>
                     </div>

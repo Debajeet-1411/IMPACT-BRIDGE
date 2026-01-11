@@ -197,19 +197,82 @@ export default function ProfilePage() {
                                 <div className="text-[#71767B] text-xs font-bold uppercase mb-2">Shortage Prediction</div>
                                 <div className="p-3 bg-[#F91880]/10 border border-[#F91880]/30 rounded-xl text-[#F91880] text-sm font-medium flex items-start gap-2">
                                     <AlertTriangle size={16} className="mt-0.5 shrink-0" />
-                                    Predicted shortage of 'Winter Clothes' in next 14 days based on weather forecast.
+                                    <div>Predicted shortage of <span className="font-bold">Winter Clothes</span> in Pune district (next 7 days).</div>
                                 </div>
                             </div>
-                            <div>
-                                <div className="text-[#71767B] text-xs font-bold uppercase mb-2">Suggested Donors</div>
-                                <div className="flex items-center gap-2 mb-2 cursor-pointer hover:bg-[#202327] p-1 rounded">
-                                    <div className="w-8 h-8 rounded-full bg-slate-700"></div>
-                                    <div className="text-sm font-bold text-[#E7E9EA]">Zara India Retail</div>
+                        </div>
+                    </div>
+
+                    {/* Top Corporate Donors */}
+                    <div className="bg-[#16181C] rounded-2xl border border-[#2F3336] overflow-hidden mb-4">
+                        <h2 className="font-extrabold text-lg px-4 py-3 border-b border-[#2F3336]">
+                            Top Corporate Donors
+                        </h2>
+                        <div className="p-0">
+                            {[
+                                { name: "Tata CSR", amount: "₹45 Cr", icon: "/logos/tata.png" },
+                                { name: "Reliance Fdn", amount: "₹38 Cr", icon: "/logos/reliance.png" },
+                                { name: "H&M Global", amount: "₹12 Cr", icon: null }
+                            ].map((donor, i) => (
+                                <div key={i} className="px-4 py-3 hover:bg-[#EFF3F4]/5 transition-colors cursor-pointer flex items-center gap-3 border-b border-[#2F3336] last:border-0">
+                                    <div className="bg-white w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                                        {donor.icon ? (
+                                            <img src={donor.icon} alt={donor.name} className="w-full h-full object-contain" />
+                                        ) : (
+                                            <span className="text-black font-bold text-lg">{donor.name[0]}</span>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="font-bold text-[#E7E9EA] text-[15px]">{donor.name}</div>
+                                        <div className="text-[#71767B] text-xs">Donated {donor.amount} this year</div>
+                                    </div>
+                                    <button className="bg-[#EFF3F4] text-black text-xs font-bold px-3 py-1.5 rounded-full hover:bg-[#D7DBDC]">
+                                        Follow
+                                    </button>
                                 </div>
-                                <div className="flex items-center gap-2 cursor-pointer hover:bg-[#202327] p-1 rounded">
-                                    <div className="w-8 h-8 rounded-full bg-slate-700"></div>
-                                    <div className="text-sm font-bold text-[#E7E9EA]">H&M CSR Division</div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Urgent Needs Nearby */}
+                    <div className="bg-[#16181C] rounded-2xl border border-[#2F3336] overflow-hidden mb-4">
+                        <h2 className="font-extrabold text-lg px-4 py-3 border-b border-[#2F3336] flex items-center justify-between">
+                            <span>Urgent Needs</span>
+                        </h2>
+                        <div className="p-4 space-y-4">
+                            {[
+                                { title: "O- Blood Needed", loc: "Apollo Hospital, Mumbai", time: "2h left", urgent: true },
+                                { title: "500 Blankets", loc: "Night Shelter, Delhi", time: "Tonight", urgent: false },
+                            ].map((need, i) => (
+                                <div key={i} className="relative">
+                                    <div className="flex items-start gap-2 mb-1">
+                                        {need.urgent && <AlertTriangle size={14} className="text-[#F4212E] mt-0.5 shrink-0" />}
+                                        <div className="font-bold text-[#E7E9EA] text-sm leading-tight hover:underline cursor-pointer">{need.title}</div>
+                                    </div>
+                                    <div className="text-[#71767B] text-xs flex items-center gap-1 pl-6">
+                                        <MapPin size={12} /> {need.loc} • <span className={need.urgent ? "text-[#F4212E]" : ""}>{need.time}</span>
+                                    </div>
                                 </div>
+                            ))}
+                            <div className="text-[#2563EB] text-sm cursor-pointer hover:underline pl-6">Show more</div>
+                        </div>
+                    </div>
+
+                    {/* Sector News */}
+                    <div className="bg-[#16181C] rounded-2xl border border-[#2F3336] overflow-hidden mb-4">
+                        <h2 className="font-extrabold text-lg px-4 py-3 border-b border-[#2F3336]">
+                            Sector News
+                        </h2>
+                        <div className="p-4 space-y-4">
+                            <div className="cursor-pointer group">
+                                <div className="text-[#71767B] text-xs mb-1">Policy Update</div>
+                                <div className="font-bold text-[#E7E9EA] text-[15px] leading-snug group-hover:underline">New CSR amendment mandates 100% transparency in NGO funding.</div>
+                                <div className="text-[#71767B] text-xs mt-1">Times of India • 4h ago</div>
+                            </div>
+                            <div className="cursor-pointer group">
+                                <div className="text-[#71767B] text-xs mb-1">Tech for Good</div>
+                                <div className="font-bold text-[#E7E9EA] text-[15px] leading-snug group-hover:underline">ImpactBridge wins "Best Social Innovation" at Global Tech Summit.</div>
+                                <div className="text-[#71767B] text-xs mt-1">TechCrunch • 1d ago</div>
                             </div>
                         </div>
                     </div>

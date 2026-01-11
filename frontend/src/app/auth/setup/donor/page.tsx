@@ -15,6 +15,7 @@ export default function DonorSetupPage() {
         phone: '',
     });
     const [file, setFile] = useState<File | null>(null);
+    const [coverFile, setCoverFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -24,6 +25,12 @@ export default function DonorSetupPage() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setFile(e.target.files[0]);
+        }
+    };
+
+    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setCoverFile(e.target.files[0]);
         }
     };
 
@@ -39,9 +46,19 @@ export default function DonorSetupPage() {
                 return;
             }
 
+            let avatarUrl = '';
+            let coverUrl = '';
+
             // Upload Avatar
             if (file) {
-                await profileService.uploadAvatar(userId, file);
+                const res = await profileService.uploadAvatar(userId, file);
+                avatarUrl = res.data.avatar_url;
+            }
+
+            // Upload Cover
+            if (coverFile) {
+                const res = await profileService.uploadCoverImage(userId, coverFile);
+                coverUrl = res.data.cover_image_url;
             }
 
             // Update Profile
@@ -51,9 +68,13 @@ export default function DonorSetupPage() {
                 organization_type: formData.organization_type,
                 address: formData.address,
                 phone: formData.phone,
+                metadata: {
+                    avatar: avatarUrl,
+                    cover_image: coverUrl
+                }
             });
 
-            router.push('/dashboard');
+            router.push('/dashboard/csr');
 
         } catch (err) {
             console.error(err);
@@ -80,15 +101,36 @@ export default function DonorSetupPage() {
 
                 <div className="bg-black border border-[#2F3336] shadow-xl sm:rounded-2xl overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                        {/* Avatar Upload */}
-                        <div className="flex flex-col items-center mb-6">
-                            <label className="cursor-pointer group relative">
-                                <div className="w-24 h-24 rounded-full bg-[#16181C] border-2 border-dashed border-[#2F3336] flex items-center justify-center group-hover:border-white transition-colors overflow-hidden">
-                                    {file ? (
-                                        <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+
+                        {/* Cover Image Upload (Optional) */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold text-[#E7E9EA] mb-2">Cover Image (Optional)</label>
+                            <label className="cursor-pointer group relative block">
+                                <div className="w-full h-32 rounded-lg bg-[#16181C] border-2 border-dashed border-[#2F3336] flex items-center justify-center group-hover:border-white transition-colors overflow-hidden">
+                                    {coverFile ? (
+                                        <img src={URL.createObjectURL(coverFile)} alt="Cover Preview" className="w-full h-full object-cover" />
                                     ) : (
-                                        <Upload className="text-[#71767B]" />
+                                        <div className="text-center">
+                                            <Upload className="text-[#71767B] mx-auto mb-2" />
+                                            <span className="text-xs text-[#71767B]">Upload banner (800×200 recommended)</span>
+                                        </div>
                                     )}
+                                </div>
+                                <input type="file" className="hidden" onChange={handleCoverChange} accept="image/*" />
+                            </label>
+                        </div>
+
+                        {/* Avatar Upload */}
+                        <div className="flex flex-col items-center mb-6 relative -mt-16">
+                            <label className="cursor-pointer group relative">
+                                <div className="w-24 h-24 rounded-full bg-black border-4 border-black flex items-center justify-center overflow-hidden shadow-lg relative z-10">
+                                    <div className="w-full h-full bg-[#16181C] border-2 border-dashed border-[#2F3336] flex items-center justify-center group-hover:border-white transition-colors overflow-hidden rounded-full">
+                                        {file ? (
+                                            <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Upload className="text-[#71767B]" />
+                                        )}
+                                    </div>
                                 </div>
                                 <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
                                 <span className="mt-2 block text-xs text-[#E7E9EA] font-bold text-center">Upload Logo</span>

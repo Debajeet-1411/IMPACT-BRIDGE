@@ -29,6 +29,7 @@ export default function NGOSetupPage() {
         urgency_level: 5
     });
     const [file, setFile] = useState<File | null>(null);
+    const [coverFile, setCoverFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -41,58 +42,17 @@ export default function NGOSetupPage() {
         }
     };
 
+    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setCoverFile(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            const token = localStorage.getItem('token');
-            if (!token) throw new Error("No token found");
-
-            // Decode token to get user_id (sub is email, need to fetch profile first to get ID? 
-            // Actually backend update_profile uses user_id in URL.
-            // Wait, standard JWT usually has 'sub' as ID or explicit ID. 
-            // My backend uses email as 'sub'.
-
-            // Strategy: Login returns token. 
-            // API needs /api/profiles/{user_id}. 
-            // User ID is UUID.
-            // I need to fetch current user or profile first? 
-            // Or updates logic to use 'me' alias? 
-            // Backend api/profiles/{user_id}.
-            // Problem: Frontend doesn't know UUID from token (only email).
-
-            // FAST FIX: Add /api/auth/me or similar, OR trust the backend to look up by Token?
-            // Profiles API requires user_id.
-            // Let's assume for now I need to GET /api/auth/me or verify against lookup.
-            // BUT current backend endpoints use user_id explicitly.
-
-            // Better approach: I update the Profile using the email (sub) from the token?
-            // No, Profiles API expects UUID.
-
-            // Let's fetch the profile first using the email? No, endpoint is by UUID.
-
-            // Quickest Fix: Decode token -> check if "id" is present. 
-            // Backend logic: 
-            // `access_token = security.create_access_token(data={"sub": user.email, "role": user.role})`
-            // It DOES NOT put UUID in token.
-
-            // I will update Login/Signup response to return user_id as well!
-            // OR I create a endpoint to get 'me'.
-
-            // Let's rely on `devLogin` response which is just token.
-            // I will assume for this implementation that I will first fetch "me" or 
-            // update `auth.py` to return user_id in the token response body.
-
-            // Since I control backend, I will UPDATING auth.py to return user_id is best.
-            // I'll do that in task boundary next.
-
-            // For now, I'll fetch `/api/auth/me` (IF IT EXISTED) or assumes I can get it.
-            // Actually, I can use a hack: loop through all profiles? No.
-
-            // OK, I'll add `user_id` to the Signup/Login response in `auth.py`.
-            // For this file, I'll assume I have `localStorage.getItem('user_id')`.
-
             const userId = localStorage.getItem('user_id');
             if (!userId) {
                 alert("Session error, please sign in again");
@@ -100,9 +60,19 @@ export default function NGOSetupPage() {
                 return;
             }
 
+            let avatarUrl = '';
+            let coverUrl = '';
+
             // Upload Avatar
             if (file) {
-                await profileService.uploadAvatar(userId, file);
+                const res = await profileService.uploadAvatar(userId, file);
+                avatarUrl = res.data.avatar_url;
+            }
+
+            // Upload Cover
+            if (coverFile) {
+                const res = await profileService.uploadCoverImage(userId, coverFile);
+                coverUrl = res.data.cover_image_url;
             }
 
             // Update Profile
@@ -113,10 +83,14 @@ export default function NGOSetupPage() {
                 phone: formData.phone,
                 capacity: formData.capacity,
                 urgency_level: formData.urgency_level,
-                accepted_donation_types: [formData.accepted_donation_types]
+                accepted_donation_types: [formData.accepted_donation_types],
+                metadata: {
+                    avatar: avatarUrl,
+                    cover_image: coverUrl
+                }
             });
 
-            router.push('/dashboard');
+            router.push('/home');
 
         } catch (err) {
             console.error(err);
@@ -143,15 +117,36 @@ export default function NGOSetupPage() {
 
                 <div className="bg-black border border-[#2F3336] shadow-xl sm:rounded-2xl overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                        {/* Avatar Upload */}
-                        <div className="flex flex-col items-center mb-6">
-                            <label className="cursor-pointer group relative">
-                                <div className="w-24 h-24 rounded-full bg-[#16181C] border-2 border-dashed border-[#2F3336] flex items-center justify-center group-hover:border-[#2563EB] transition-colors overflow-hidden">
-                                    {file ? (
-                                        <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+
+                        {/* Cover Image Upload (Optional) */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold text-[#E7E9EA] mb-2">Cover Image (Optional)</label>
+                            <label className="cursor-pointer group relative block">
+                                <div className="w-full h-32 rounded-lg bg-[#16181C] border-2 border-dashed border-[#2F3336] flex items-center justify-center group-hover:border-[#2563EB] transition-colors overflow-hidden">
+                                    {coverFile ? (
+                                        <img src={URL.createObjectURL(coverFile)} alt="Cover Preview" className="w-full h-full object-cover" />
                                     ) : (
-                                        <Upload className="text-[#71767B]" />
+                                        <div className="text-center">
+                                            <Upload className="text-[#71767B] mx-auto mb-2" />
+                                            <span className="text-xs text-[#71767B]">Upload banner (800×200 recommended)</span>
+                                        </div>
                                     )}
+                                </div>
+                                <input type="file" className="hidden" onChange={handleCoverChange} accept="image/*" />
+                            </label>
+                        </div>
+
+                        {/* Avatar Upload */}
+                        <div className="flex flex-col items-center mb-6 relative -mt-16">
+                            <label className="cursor-pointer group relative">
+                                <div className="w-24 h-24 rounded-full bg-black border-4 border-black flex items-center justify-center overflow-hidden shadow-lg relative z-10">
+                                    <div className="w-full h-full bg-[#16181C] border-2 border-dashed border-[#2F3336] flex items-center justify-center group-hover:border-[#2563EB] transition-colors overflow-hidden rounded-full">
+                                        {file ? (
+                                            <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Upload className="text-[#71767B]" />
+                                        )}
+                                    </div>
                                 </div>
                                 <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
                                 <span className="mt-2 block text-xs text-[#2563EB] font-bold text-center">Upload Logo</span>

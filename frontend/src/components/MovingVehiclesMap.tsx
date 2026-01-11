@@ -1,154 +1,143 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icon
-const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
-const iconRetinaUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png';
-const shadowUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png';
-
-const customIcon = L.icon({
-    iconUrl: iconUrl,
-    iconRetinaUrl: iconRetinaUrl,
-    shadowUrl: shadowUrl,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
-
-// Vehicle Icon
-const truckIcon = L.divIcon({
-    html: `<div style="font-size: 16px; line-height: 1; text-shadow: 0 0 5px #000;">🚚</div>`,
-    className: 'custom-vehicle-icon',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10]
-});
+import { useEffect, useState, useMemo, Fragment } from "react";
+import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 // Major Roads in Pune (Approximate coordinates)
-const ROAD_NETWORKS = [
+const ROAD_NETWORKS: [number, number][][] = [
     // Pune-Bangalore Highway (North-South)
     [
-        [18.5700, 73.7800], [18.5600, 73.7850], [18.5500, 73.7900],
-        [18.5300, 73.8000], [18.5100, 73.8100], [18.4900, 73.8200], [18.4700, 73.8300]
+        [18.57, 73.78],
+        [18.56, 73.785],
+        [18.55, 73.79],
+        [18.53, 73.8],
+        [18.51, 73.81],
+        [18.49, 73.82],
+        [18.47, 73.83],
     ],
-    // Ahmednagar Road (NorthEast to Center)
     [
-        [18.5800, 73.9500], [18.5700, 73.9300], [18.5600, 73.9100],
-        [18.5500, 73.8900], [18.5400, 73.8800], [18.5300, 73.8700]
+        [18.58, 73.95],
+        [18.57, 73.93],
+        [18.56, 73.91],
+        [18.55, 73.89],
+        [18.54, 73.88],
+        [18.53, 73.87],
     ],
-    // Old Mumbai-Pune Hwy (West to Center)
     [
-        [18.5750, 73.8000], [18.5650, 73.8200], [18.5500, 73.8400],
-        [18.5400, 73.8500], [18.5300, 73.8550], [18.5200, 73.8600]
+        [18.575, 73.8],
+        [18.565, 73.82],
+        [18.55, 73.84],
+        [18.54, 73.85],
+        [18.53, 73.855],
+        [18.52, 73.86],
     ],
-    // Solapur Road (East to Center)
     [
-        [18.5000, 73.9500], [18.5100, 73.9300], [18.5150, 73.9100],
-        [18.5200, 73.8900], [18.5250, 73.8700]
-    ]
+        [18.5, 73.95],
+        [18.51, 73.93],
+        [18.515, 73.91],
+        [18.52, 73.89],
+        [18.525, 73.87],
+    ],
 ];
 
 interface Vehicle {
     id: number;
     routeId: number;
-    segmentIndex: number; // Current starting point index
-    direction: 1 | -1;    // 1 = moving towards higher indices, -1 = lowering
-    segmentProgress: number; // 0 to 1
+    segmentIndex: number;
+    direction: 1 | -1;
+    segmentProgress: number;
     speed: number;
     current: [number, number];
-    pathHistory: [number, number][]; // For ray tracing trail
+    pathHistory: [number, number][];
 }
 
-function lerp(start: number, end: number, t: number) {
-    return start * (1 - t) + end * t;
-}
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export default function MovingVehiclesMap() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
 
-    // Pune Center
+    const truckIcon = useMemo(
+        () =>
+            L.divIcon({
+                html: `<div style="font-size:16px;text-shadow:0 0 4px #000;">🚚</div>`,
+                className: "",
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+            }),
+        []
+    );
+
     const center: [number, number] = [18.5204, 73.8567];
 
     useEffect(() => {
-        // Initialize 12 vehicles assigned to random roads
         const initialVehicles: Vehicle[] = Array.from({ length: 12 }).map((_, i) => {
             const routeId = i % ROAD_NETWORKS.length;
             const route = ROAD_NETWORKS[routeId];
-            // Pick a random start point (safe from ends for simplicity, or handle logic)
-            // Safety: up to length-2 so forward works
-            const startSegment = Math.floor(Math.random() * (route.length - 1));
+            const segmentIndex = Math.floor(Math.random() * (route.length - 1));
 
             return {
                 id: i,
                 routeId,
-                segmentIndex: startSegment,
-                direction: 1, // Start moving forward
+                segmentIndex,
+                direction: 1,
                 segmentProgress: Math.random(),
-                // Much slower speed: ~0.005 progress per tick (approx 30km/h simulation)
-                // Reduced even further to 1/4th speed
                 speed: (0.002 + Math.random() * 0.003) / 4,
-                current: route[startSegment] as [number, number],
-                pathHistory: []
+                current: route[segmentIndex] as [number, number],
+                pathHistory: [] as [number, number][],
             };
         });
+
         setVehicles(initialVehicles);
     }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setVehicles(prev => prev.map(v => {
-                const route = ROAD_NETWORKS[v.routeId];
-                let nextProgress = v.segmentProgress + v.speed;
-                let currentIdx = v.segmentIndex;
-                let direction = v.direction;
+            setVehicles(prev =>
+                prev.map(v => {
+                    const route = ROAD_NETWORKS[v.routeId];
+                    let { segmentIndex, direction, segmentProgress } = v;
 
-                // Move to next segment if progress > 1
-                if (nextProgress >= 1) {
-                    nextProgress = 0;
+                    segmentProgress += v.speed;
 
-                    // Logic: You are at 'currentIdx', moving to 'currentIdx + direction'
-                    // The move is finished. The 'currentIdx + direction' becomes the new 'currentIdx'
-                    const arrivalPoint = currentIdx + direction;
-                    currentIdx = arrivalPoint;
+                    while (segmentProgress >= 1) {
+                        segmentProgress -= 1;
+                        segmentIndex += direction;
 
-                    // Calculate NEXT target to verify bounds
-                    let nextTarget = currentIdx + direction;
+                        // Reverse safely BEFORE going out of bounds
+                        if (segmentIndex >= route.length - 1) {
+                            segmentIndex = route.length - 2;
+                            direction = -1;
+                        }
 
-                    // If we hit the end (length-1) or start (0), reverse direction
-                    if (nextTarget >= route.length || nextTarget < 0) {
-                        direction *= -1; // Flip direction
-                        v.pathHistory = []; // Optional: clear trail on turn-around or keep it? Let's keep smooth
+                        if (segmentIndex <= 0) {
+                            segmentIndex = 0;
+                            direction = 1;
+                        }
                     }
-                }
 
-                const p1 = route[currentIdx];
-                // Target is always current + direction
-                const p2 = route[currentIdx + direction];
+                    const p1 = route[segmentIndex];
+                    const p2 = route[segmentIndex + direction];
 
-                // Update Trail (keep last 20 points for ray tracing effect)
-                // Only add to history if we moved significantly or it's a new frame
-                // Actually standard push is fine given the loop speed
+                    const current: [number, number] = [
+                        lerp(p1[0], p2[0], segmentProgress),
+                        lerp(p1[1], p2[1], segmentProgress),
+                    ];
 
-                // Interpolate position
-                const lat = lerp(p1[0], p2[0], nextProgress);
-                const lng = lerp(p1[1], p2[1], nextProgress);
-                const currentPos: [number, number] = [lat, lng];
+                    const pathHistory = [...v.pathHistory, current].slice(-20);
 
-                const newHistory = [...v.pathHistory, currentPos].slice(-20);
-
-                return {
-                    ...v,
-                    segmentIndex: currentIdx,
-                    direction: direction,
-                    segmentProgress: nextProgress,
-                    current: currentPos,
-                    pathHistory: newHistory
-                };
-            }));
-        }, 50); // 20fps update rate
+                    return {
+                        ...v,
+                        segmentIndex,
+                        direction,
+                        segmentProgress,
+                        current,
+                        pathHistory,
+                    };
+                })
+            );
+        }, 50);
 
         return () => clearInterval(interval);
     }, []);
@@ -157,36 +146,34 @@ export default function MovingVehiclesMap() {
         <MapContainer
             center={center}
             zoom={12}
-            style={{ height: '100%', width: '100%', borderRadius: '1rem', background: '#16181C' }}
+            style={{ height: "100%", width: "100%", borderRadius: "1rem" }}
             zoomControl={false}
         >
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            />
+            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
 
-            {/* Draw Base Roads (Optional: Faint lines to show infrastructure) */}
-            {ROAD_NETWORKS.map((route, i) => (
-                <Polyline key={`road-${i}`} positions={route as L.LatLngExpression[]} pathOptions={{ color: '#2F3336', weight: 4, opacity: 0.5 }} />
+            {ROAD_NETWORKS.map((r, i) => (
+                <Polyline
+                    key={i}
+                    positions={r}
+                    pathOptions={{ color: "#2F3336", weight: 4, opacity: 0.5 }}
+                />
             ))}
 
             {vehicles.map(v => (
-                <div key={v.id}>
-                    {/* Ray Tracing Trail - Only render if we have points */}
+                <Fragment key={v.id}>
                     {v.pathHistory.length > 1 && (
                         <Polyline
                             positions={v.pathHistory}
-                            pathOptions={{ color: '#2563EB', weight: 3, opacity: 0.6 }}
+                            pathOptions={{ color: "#2563EB", weight: 3, opacity: 0.6 }}
                         />
                     )}
 
-                    {/* The Vehicle */}
                     <Marker position={v.current} icon={truckIcon}>
-                        <Popup className="custom-popup">
-                            <div className="text-black font-bold text-xs p-1">Vehicle #{v.id + 1}</div>
+                        <Popup>
+                            <strong>Vehicle #{v.id + 1}</strong>
                         </Popup>
                     </Marker>
-                </div>
+                </Fragment>
             ))}
         </MapContainer>
     );
