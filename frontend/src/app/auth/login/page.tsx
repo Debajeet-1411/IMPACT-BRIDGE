@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { authService } from '@/services/api';
 import { Zap, Users, Building2, ArrowRight } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 function LoginContent() {
     const router = useRouter();
@@ -13,6 +14,33 @@ function LoginContent() {
     const [email, setEmail] = useState('');
     const [role, setRole] = useState(initialRole);
     const [loading, setLoading] = useState(false);
+
+    const handleGoogleSuccess = async (response: any) => {
+        setLoading(true);
+        try {
+            if (response.credential) {
+                const apiRes = await authService.googleLogin(response.credential);
+                const data = apiRes.data;
+
+                if (data.is_new_user) {
+                    // Redirect to onboarding
+                    localStorage.setItem('onboarding_email', data.email!);
+                    localStorage.setItem('onboarding_name', data.name!);
+                    router.push('/auth/onboarding');
+                } else {
+                    // Success login
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('role', data.role);
+                    router.push('/home');
+                }
+            }
+        } catch (error) {
+            console.error("Google Login Error", error);
+            alert("Google Login failed");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,6 +67,27 @@ function LoginContent() {
             <h1 className="text-3xl font-extrabold text-[#E7E9EA] mb-8 text-center">Sign in to ImpactBridge</h1>
 
             <div className="bg-black rounded-2xl">
+                <div className="mb-6">
+                    <div className="flex flex-col gap-3">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => console.log('Login Failed')}
+                            theme="filled_black"
+                            shape="pill"
+                            width="100%"
+                            text="continue_with"
+                        />
+                        <div className="relative my-2">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-[#2F3336]" />
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-black text-[#71767B]">or</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
                         <label className="block text-[15px] font-bold text-[#E7E9EA] mb-3">

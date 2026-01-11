@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import { Home, Search, Bell, Mail, FileText, User, MoreHorizontal, Zap, Building, Landmark, Truck, BarChart3, ShieldCheck } from 'lucide-react';
+import { Home, Search, Bell, Mail, FileText, User, MoreHorizontal, Zap, Building, Landmark, Truck, BarChart3, ShieldCheck, Info } from 'lucide-react';
 type SidebarPage =
     | 'feed'
     | 'matches'
@@ -10,7 +10,8 @@ type SidebarPage =
     | 'notifications'
     | 'logistics'
     | 'csr'
-    | 'govt';
+    | 'govt'
+    | 'about';
 
 interface SidebarProps {
     current: SidebarPage;
@@ -24,6 +25,7 @@ export default function Sidebar({ current }: SidebarProps) {
         { icon: Bell, label: 'Notifications', href: '/notifications', id: 'notifications' },
         { icon: Mail, label: 'Messages', href: '/messages', id: 'messages' },
         { icon: FileText, label: 'Impact Reports', href: '/reports', id: 'reports' },
+        { icon: Info, label: 'About Us', href: '/about', id: 'about' },
         { icon: User, label: 'Profile', href: '/profile', id: 'profile' },
     ] as const;
 

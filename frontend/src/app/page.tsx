@@ -37,12 +37,15 @@ export default function LandingPage() {
                     </div>
                     <div className="hidden md:flex items-center gap-8 font-bold text-[15px]">
                         <a href="#" className="relative text-[#E7E9EA]">Home <div className="absolute -bottom-[17px] left-0 w-full h-[4px] bg-[#2563EB] rounded-full"></div></a>
-                        <a href="#about" className="text-[#71767B] hover:text-[#E7E9EA] transition-colors">About</a>
+                        <Link href="/about" className="text-[#71767B] hover:text-[#E7E9EA] transition-colors">About</Link>
                         <a href="#impact" className="text-[#71767B] hover:text-[#E7E9EA] transition-colors">Impact</a>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Link href="/home" className="px-5 py-1.5 bg-[#EFF3F4] text-black rounded-full font-bold text-sm hover:bg-[#D7DBDC] transition-colors">
-                            Go to App
+                        <Link href="/auth/login" className="px-5 py-1.5 text-[#E7E9EA] font-bold text-sm hover:underline transition-colors">
+                            Log in
+                        </Link>
+                        <Link href="/auth/select-role" className="px-5 py-1.5 bg-[#E7E9EA] text-black rounded-full font-bold text-sm hover:bg-[#D7DBDC] transition-colors">
+                            Sign up
                         </Link>
                     </div>
                 </div>
@@ -67,13 +70,13 @@ export default function LandingPage() {
 
                     <div className="flex items-center justify-center gap-4">
                         <Link
-                            href="/home"
+                            href="/auth/select-role"
                             className="px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold text-lg hover:bg-[#1D4ED8] transition-colors"
                         >
                             Get Started
                         </Link>
                         <Link
-                            href="#about"
+                            href="/about"
                             className="px-8 py-3 bg-transparent text-[#E7E9EA] rounded-full font-bold text-lg border border-[#536471] hover:bg-[rgba(239,243,244,0.1)] transition-colors"
                         >
                             Learn More
@@ -232,7 +235,7 @@ export default function LandingPage() {
 
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* NGO Card */}
-                        <Link href="/home" className="group">
+                        <Link href="/auth/select-role?role=NGO" className="group">
                             <div className="bg-[#16181C] rounded-2xl border border-[#2F3336] p-8 hover:border-[#2563EB] transition-all duration-300 hover:shadow-lg hover:shadow-[#2563EB]/20 h-full">
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="w-16 h-16 rounded-full bg-[#2563EB]/10 flex items-center justify-center group-hover:bg-[#2563EB]/20 transition-colors">
@@ -262,7 +265,7 @@ export default function LandingPage() {
                         </Link>
 
                         {/* Contributor Card */}
-                        <Link href="/home" className="group">
+                        <Link href="/auth/select-role?role=COMPANY" className="group">
                             <div className="bg-[#16181C] rounded-2xl border border-[#2F3336] p-8 hover:border-[#00BA7C] transition-all duration-300 hover:shadow-lg hover:shadow-[#00BA7C]/20 h-full">
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="w-16 h-16 rounded-full bg-[#00BA7C]/10 flex items-center justify-center group-hover:bg-[#00BA7C]/20 transition-colors">
@@ -305,7 +308,7 @@ export default function LandingPage() {
                     </h2>
                     <div className="flex items-center justify-center gap-4 flex-wrap">
                         <Link
-                            href="/home"
+                            href="/auth/select-role"
                             className="px-10 py-4 bg-[#E7E9EA] text-black rounded-full font-bold text-xl hover:bg-[#D7DBDC] transition-colors"
                         >
                             Get Started
@@ -318,7 +321,7 @@ export default function LandingPage() {
             <footer className="py-12 px-6">
                 <div className="max-w-[1265px] mx-auto text-center text-[#71767B] text-sm">
                     <div className="flex justify-center gap-6 mb-4">
-                        <a href="#" className="hover:text-[#E7E9EA] hover:underline">About</a>
+                        <Link href="/about" className="hover:text-[#E7E9EA] hover:underline">About</Link>
                         <a href="#" className="hover:text-[#E7E9EA] hover:underline">Help Center</a>
                         <a href="#" className="hover:text-[#E7E9EA] hover:underline">Terms of Service</a>
                         <a href="#" className="hover:text-[#E7E9EA] hover:underline">Privacy Policy</a>

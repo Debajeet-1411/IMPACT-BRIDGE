@@ -1,4 +1,5 @@
 import { NGOS, COMPANIES } from '../data/seedData';
+import { jwtDecode } from "jwt-decode";
 
 // Mock types
 interface UserData {
@@ -7,10 +8,26 @@ interface UserData {
     role: string;
     name?: string;
     email?: string;
+    is_new_user?: boolean;
 }
 
 // Helper to simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Helper to get local users
+const getLocalUsers = () => {
+    if (typeof window === 'undefined') return {};
+    const users = localStorage.getItem('mock_users');
+    return users ? JSON.parse(users) : {};
+};
+
+// Helper to save local user
+const saveLocalUser = (email: string, userData: any) => {
+    if (typeof window === 'undefined') return;
+    const users = getLocalUsers();
+    users[email] = userData;
+    localStorage.setItem('mock_users', JSON.stringify(users));
+};
 
 export const authService = {
     login: async (email: string, role: string) => {
@@ -22,6 +39,85 @@ export const authService = {
                 role: role,
                 name: "Test User",
                 email: email
+            }
+        };
+    },
+    googleLogin: async (credential: string) => {
+        await delay(800);
+        const decoded: any = jwtDecode(credential);
+        const email = decoded.email;
+        const name = decoded.name;
+        const picture = decoded.picture;
+
+        // Check against seed data first
+        const ngoMatch = NGOS.find((n: any) => n.contact_email === email); // Assuming contact_email exists or similar check
+        const compMatch = COMPANIES.find(c => c.name.toLowerCase().includes(email.split('@')[0])); // Rough match
+
+        if (ngoMatch) {
+            return {
+                data: {
+                    access_token: "mock-google-token",
+                    user_id: `ngo-${NGOS.indexOf(ngoMatch)}`,
+                    role: "NGO",
+                    name: ngoMatch.name,
+                    email: email,
+                    is_new_user: false
+                }
+            };
+        }
+
+        if (compMatch) {
+            return {
+                data: {
+                    access_token: "mock-google-token",
+                    user_id: `comp-${COMPANIES.indexOf(compMatch)}`,
+                    role: "COMPANY",
+                    name: compMatch.name,
+                    email: email,
+                    is_new_user: false
+                }
+            };
+        }
+
+        // Check local storage for signed up users
+        const localUsers = getLocalUsers();
+        if (localUsers[email]) {
+            return {
+                data: {
+                    access_token: "mock-google-token",
+                    ...localUsers[email],
+                    is_new_user: false
+                }
+            };
+        }
+
+        // If not found, it's a new user
+        return {
+            data: {
+                access_token: "mock-pending-token",
+                email: email,
+                name: name,
+                avatar: picture,
+                is_new_user: true
+            }
+        };
+    },
+    completeOnboarding: async (data: any) => {
+        await delay(1000);
+        const userId = `new-user-${Date.now()}`;
+        const finalData = {
+            ...data,
+            user_id: userId,
+            is_verified: true // Auto-verify for demo
+        };
+
+        // Save to local storage
+        saveLocalUser(data.email, finalData);
+
+        return {
+            data: {
+                access_token: "mock-final-token",
+                ...finalData
             }
         };
     },
@@ -47,6 +143,7 @@ export const authService = {
             }
         };
     }
+
 };
 
 export const postService = {
@@ -106,6 +203,29 @@ export const postService = {
 export const profileService = {
     get: async (userId: string) => {
         await delay(300);
+
+        // Check local storage users first (for newly onboarded users)
+        const localUsers = getLocalUsers();
+        const localUserUrl = Object.values(localUsers).find((u: any) => u.user_id === userId);
+        if (localUserUrl) {
+            const u: any = localUserUrl;
+            return {
+                data: {
+                    id: u.user_id,
+                    name: u.companyName || u.name,
+                    bio: u.description || "No description provided.",
+                    location: "India", // Default
+                    role: u.role,
+                    is_verified: true,
+                    avatar: u.avatar || "",
+                    metadata_json: {
+                        avatar: u.avatar,
+                        cover_image: "https://via.placeholder.com/800x200"
+                    },
+                    user_id: u.user_id
+                }
+            };
+        }
 
         // Check if it's an NGO profile
         if (userId.startsWith('ngo-')) {
