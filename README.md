@@ -4,6 +4,8 @@
 
 **Impact Bridge** is a production-ready web platform that intelligently connects corporate donors with NGOs through AI-powered matching, reducing waste and maximizing social impact. The platform uses Google's Gemini AI to analyze donations, match them with appropriate NGOs, generate explainable recommendations, and produce professional CSR impact reports.
 
+## Live Website 
+https://impact-bridge.vercel.app/
 ## 🏗️ Architecture
 
 ```
@@ -562,3 +564,4 @@ This is a demonstration project. For production use:
 **Built with ❤️ for social impact**
 
 For questions or support, please refer to the documentation above.
+
