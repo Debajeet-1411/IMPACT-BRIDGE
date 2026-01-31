@@ -1,7 +1,7 @@
 # Impact Bridge - AI-Powered NGO-CSR Donation Platform
 
 ## 🚀 Overview
-
+This is just the prototype of the actual project but its well mantained and fully functional. A good MVP.
 **Impact Bridge** is a production-ready web platform that intelligently connects corporate donors with NGOs through AI-powered matching, reducing waste and maximizing social impact. The platform uses Google's Gemini AI to analyze donations, match them with appropriate NGOs, generate explainable recommendations, and produce professional CSR impact reports.
 
 ## Live Website 
@@ -564,4 +564,5 @@ This is a demonstration project. For production use:
 **Built with ❤️ for social impact**
 
 For questions or support, please refer to the documentation above.
+
 
